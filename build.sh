@@ -4,20 +4,13 @@ set -eu
 COREX_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 COREX_SIDE=${1:-right}
 COREX_VARIANT=${2:-both}
-case "$COREX_SIDE" in right|left|stock-left|stock-right|all) ;; *) echo 'Usage: ./build.sh [right|left|stock-left|stock-right|all] [s140v6|s140v7|both]' >&2; exit 2 ;; esac
+case "$COREX_SIDE" in right|left|stock-left|all) ;; *) echo 'Usage: ./build.sh [right|left|stock-left|all] [s140v6|s140v7|both]' >&2; exit 2 ;; esac
 case "$COREX_VARIANT" in s140v6|s140v7|both) ;; *) echo 'Choose s140v6, s140v7 or both' >&2; exit 2 ;; esac
 # Do not inherit a board/configuration from another build invocation.
 unset COREX_BOARD COREX_RAYTAC_APP_BASE KEYBOARD_TOML_PATH
-for COREX_HALF in right left stock-left stock-right; do
-    # Existing release automation keeps its original five targets.
-    if [ "$COREX_SIDE" = all ] && [ "$COREX_HALF" = stock-right ]; then continue; fi
+for COREX_HALF in right left stock-left; do
     if [ "$COREX_SIDE" != all ] && [ "$COREX_SIDE" != "$COREX_HALF" ]; then continue; fi
     COREX_TARGET="${CARGO_TARGET_DIR:-$COREX_ROOT/build/target}/$COREX_HALF"
-    if [ "$COREX_HALF" = stock-right ]; then
-        python3 "$COREX_ROOT/tools/stock_cornix.py" --check
-        COREX_BOARD=cornix-stock-right CARGO_TARGET_DIR="$COREX_TARGET" "$COREX_ROOT/tools/build-board.sh" right
-        continue
-    fi
     if [ "$COREX_HALF" = stock-left ]; then
         COREX_BOARD=prototype CARGO_TARGET_DIR="$COREX_TARGET" "$COREX_ROOT/tools/build-board.sh" left
         continue

@@ -27,7 +27,7 @@ jobs:
       - name: Run checks
         run: ./tools/test.sh
   firmware-builds:
-    name: Build CoreX variants and stock Cornix preview
+    name: Build all five firmware variants
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -42,9 +42,7 @@ jobs:
           rustup toolchain install 1.95.0 --profile minimal --target thumbv7em-none-eabihf --component llvm-tools-preview
           cargo +1.95.0 install flip-link --version 0.1.12 --locked
       - name: Build application images
-        run: |
-          ./build.sh all
-          ./build.sh stock-right
+        run: ./build.sh all
       - name: Verify builds, configuration identity and storage schema
         run: |
           python3 tools/verify_release.py --rebuilt
@@ -57,14 +55,3 @@ jobs:
           for key in ['configuration_profile', 'storage_schema_hash', 'device_names', 'release']:
               assert old[key] == new[key], f'Rebuilt {key} differs from distribution'
           PY
-      - name: Verify stock Cornix preview
-        run: |
-          cp firmware/cornix-stock-preview/manifest.json build/stock-distributed-manifest.json
-          python3 tools/package_stock.py
-          python3 tools/test_stock_cornix.py
-          python3 - <<'PYCODE'
-          import json
-          old = json.load(open('build/stock-distributed-manifest.json'))
-          new = json.load(open('firmware/cornix-stock-preview/manifest.json'))
-          assert old['configuration_profile'] == new['configuration_profile']
-          PYCODE

@@ -1,33 +1,21 @@
 #![no_std]
 #![no_main]
-#[cfg(not(any(feature = "raytac-r-a14", feature = "cornix-stock-right")))]
+#[cfg(not(feature = "raytac-r-a14"))]
 mod gesture_config;
 #[cfg(feature = "raytac-r-a14")]
 #[path = "gesture_config_raytac.rs"]
 mod gesture_config;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod paw3222;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod paw3222_schedule;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod paw_wire;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod pointing_mode;
 mod pairing_keys;
 #[path = "../../shared/status_led.rs"]
 mod status_led;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod tuning;
-#[cfg(not(feature = "cornix-stock-right"))]
 mod tuning_values;
-#[cfg(not(feature = "cornix-stock-right"))]
 use rmk::macros::rmk_central;
-#[cfg(feature = "cornix-stock-right")]
-mod stock;
-#[cfg(all(feature = "cornix-stock-right", feature = "raytac-r-a14"))]
-compile_error!("Select exactly one board");
 // Raytac uses independent PAW3222 modules on J4 (device 0) and J3 (device 1).
-#[cfg(not(feature = "cornix-stock-right"))]
 #[rmk_central]
 mod keyboard {
     #[register_processor(poll)]

@@ -5,13 +5,8 @@ COREX_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 COREX_SIDE=${1:-}
 case "$COREX_SIDE" in right|left) ;; *) printf 'Use ./build.sh [right|left|stock-left|all] [s140v6|s140v7|both]\n' >&2; exit 2 ;; esac
 COREX_BOARD=${COREX_BOARD:-prototype}
-case "$COREX_BOARD" in prototype|raytac-r-a14|raytac-l-rev1|cornix-stock-right) ;; *) printf 'Unknown CoreX board\n' >&2; exit 2 ;; esac
-if [ "$COREX_BOARD" = cornix-stock-right ]; then
-    [ "$COREX_SIDE" = right ] || exit 2
-    unset COREX_RAYTAC_APP_BASE
-    KEYBOARD_TOML_PATH="$COREX_ROOT/source/corex-rmk-pair/right/keyboard-stock.toml"
-    COREX_UF2_TARGET=stock-right
-elif [ "$COREX_BOARD" != prototype ]; then
+case "$COREX_BOARD" in prototype|raytac-r-a14|raytac-l-rev1) ;; *) printf 'Unknown CoreX board\n' >&2; exit 2 ;; esac
+if [ "$COREX_BOARD" != prototype ]; then
     case "$COREX_BOARD" in
         raytac-r-a14) COREX_EXPECTED_SIDE=right; COREX_MODEL=Right ;;
         raytac-l-rev1) COREX_EXPECTED_SIDE=left; COREX_MODEL=Left ;;
@@ -65,10 +60,7 @@ mkdir -p "$COREX_ROOT/build/firmware"
 for COREX_HALF in right left; do
     if [ "$COREX_SIDE" != both ] && [ "$COREX_SIDE" != "$COREX_HALF" ]; then continue; fi
     cd "$COREX_ROOT/source/corex-rmk-pair/$COREX_HALF"
-    if [ "$COREX_BOARD" = cornix-stock-right ]; then
-        cargo build --release --locked --features cornix-stock-right
-        COREX_NAME="Cornix-Stock-Right-v$COREX_FIRMWARE_VERSION"
-    elif [ "$COREX_BOARD" != prototype ]; then
+    if [ "$COREX_BOARD" != prototype ]; then
         cargo build --release --locked --features "$COREX_BOARD"
         COREX_NAME="CoreX-$COREX_MODEL-v$COREX_FIRMWARE_VERSION-$COREX_SOFTDEVICE"
     else

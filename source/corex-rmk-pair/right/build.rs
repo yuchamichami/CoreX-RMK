@@ -19,7 +19,6 @@ use const_gen::*;
 use xz2::read::XzEncoder;
 
 fn main() {
-    let stock = env::var_os("CARGO_FEATURE_CORNIX_STOCK_RIGHT").is_some();
     let raytac = env::var_os("CARGO_FEATURE_RAYTAC_R_A14").is_some();
     println!("cargo:rerun-if-env-changed=COREX_RAYTAC_APP_BASE");
     println!("cargo:rerun-if-env-changed=KEYBOARD_TOML_PATH");
@@ -28,19 +27,10 @@ fn main() {
         assert_eq!(Path::new(&keyboard).file_name().unwrap(), "keyboard-raytac.toml",
                    "Raytac GPIO feature requires its matching matrix configuration");
     }
-    assert!(!(stock && raytac), "Select exactly one board");
-    if stock {
-        let keyboard = env::var_os("KEYBOARD_TOML_PATH").expect("Use build.sh stock-right");
-        assert_eq!(Path::new(&keyboard).file_name().unwrap(), "keyboard-stock.toml");
-        println!("cargo:rustc-link-arg=--defsym=COREX_RAYTAC_FLASH_BASE=0x1000");
-        println!("cargo:rustc-link-arg=--defsym=COREX_FLASH_LIMIT=0xA0000");
-    }
-    println!("cargo:rerun-if-changed=keyboard-stock.toml");
-    println!("cargo:rerun-if-changed=vial-stock.json");
     // Generate vial config at the root of project
     println!("cargo:rerun-if-changed=vial.json");
     println!("cargo:rerun-if-changed=vial-raytac.json");
-    generate_vial_config(raytac, stock);
+    generate_vial_config(raytac);
 
     // Put `memory.x` in our output directory and ensure it's
     // on the linker search path.
@@ -84,11 +74,11 @@ fn main() {
     println!("cargo:rustc-link-arg=-Tdefmt.x");
 }
 
-fn generate_vial_config(raytac: bool, stock: bool) {
+fn generate_vial_config(raytac: bool) {
     // Generated vial config file
     let out_file = Path::new(&env::var_os("OUT_DIR").unwrap()).join("config_generated.rs");
 
-    let p = Path::new(if stock { "vial-stock.json" } else if raytac { "vial-raytac.json" } else { "vial.json" });
+    let p = Path::new(if raytac { "vial-raytac.json" } else { "vial.json" });
     let mut content = String::new();
     match File::open(p) {
         Ok(mut file) => {
@@ -104,7 +94,7 @@ fn generate_vial_config(raytac: bool, stock: bool) {
         .read_to_end(&mut keyboard_def_compressed)
         .unwrap();
 
-    let keyboard_id: Vec<u8> = if stock { b"CoreXST1".to_vec() } else if raytac { b"CoreXRY1".to_vec() } else { b"CoreXPR1".to_vec() };
+    let keyboard_id: Vec<u8> = if raytac { b"CoreXRY1".to_vec() } else { b"CoreXPR1".to_vec() };
     let const_declarations = [
         const_declaration!(pub VIAL_KEYBOARD_DEF = keyboard_def_compressed),
         const_declaration!(pub VIAL_KEYBOARD_ID = keyboard_id),

@@ -14,8 +14,6 @@ done
 python3 "$COREX_ROOT/tools/generate_gestures.py" --check
 python3 "$COREX_ROOT/tools/default_keymap.py" --check
 python3 "$COREX_ROOT/tools/test_default_keymap.py"
-python3 "$COREX_ROOT/tools/stock_cornix.py" --check
-python3 "$COREX_ROOT/tools/test_stock_cornix.py"
 python3 "$COREX_ROOT/tools/corex_defaults.py" --check
 python3 "$COREX_ROOT/tools/test_make_uf2.py"
 python3 "$COREX_ROOT/tools/check_licenses.py"

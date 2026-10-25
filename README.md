@@ -4,7 +4,7 @@ Cornixのケースに対応した交換基板向けのファームウェアで�
 
 このリポジトリではファームウェアを配布します。設定用Webアプリ [CoreX Studio](https://corex-studio.pages.dev/) は別に管理しています。[Vial](https://get.vial.today/)もUSB接続で使えます。
 
-**純正Cornixの左右基板向けには、別の[試験版と導入手順](docs/cornix-stock.md)があります。** 実機確認前です。以下のトラックボールの案内と交換基板用UF2は、この試験版とは別です。
+純正Cornixの左右セット向けは、別リポジトリ [CoreX-Cornix-RMK](https://github.com/yuchamichami/CoreX-Cornix-RMK) で管理しています。CoreX交換基板と組み合わせる純正左用ファームは、引き続きこちらに含みます。
 
 ## 書き込み済みのセットを使う
 

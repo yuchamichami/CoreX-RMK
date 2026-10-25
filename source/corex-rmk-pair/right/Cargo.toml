@@ -12,7 +12,6 @@ license = "MIT OR Apache-2.0"
 [features]
 # The manufactured MDBT50Q board has a different matrix and active-low RGBs.
 raytac-r-a14 = []
-cornix-stock-right = []
 
 [dependencies]
 rmk = { path = "../../corex-rmk-upstream/rmk", default-features = false, features = ["usb_log", "storage", "vial", "host_lock", "async_matrix", "nrf52840_ble", "adafruit_bl", "split"] }

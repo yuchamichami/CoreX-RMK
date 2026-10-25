@@ -34,10 +34,6 @@ Vial定義の圧縮に使うliblzmaはソースから静的にビルドし、ホ
 
 通常はリポジトリ内のキャッシュを使います。`CARGO_TARGET_DIR` を指定してビルドした場合、配布検証には標準の `build/target/` に揃えて再ビルドしてください。
 
-## 純正Cornixの左右セット（試験版）
-
-`./build.sh stock-right` で純正右を生成します。純正左は `./build.sh stock-left`、梱包は `python3 tools/package_stock.py` です。`all` と既存の5種類の配布には混ぜません。[ピン定義と検証範囲](docs/cornix-stock-validation.md)を参照してください。
-
 ## 互換性
 
 CoreX右のVial UIDは `436f726558525931`、v0.11.4のファーム識別値は `2820`、設定スキーマは `0xA805CEFB` です。この更新ではUIDや設定領域を変更しません。Vial定義には実基板に合わせた5セルの位置補正があり、Studioも同じ対応表で読み書きします。

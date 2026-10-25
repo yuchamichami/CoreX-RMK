@@ -8,7 +8,6 @@ import struct
 
 TARGETS = {
     "left": (0x1000, 0xA0000),
-    "stock-right": (0x1000, 0xA0000),
     "raytac-right-26000": (0x26000, 0xB0000),
     "raytac-right-27000": (0x27000, 0xB0000),
     "raytac-left-26000": (0x26000, 0xA0000),

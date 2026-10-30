@@ -30,7 +30,7 @@ exe = executables[0]
 names = [line.removesuffix(': test') for line in
          subprocess.check_output([exe, '--list', '--format', 'terse'], text=True).splitlines()
          if line.endswith(': test')]
-prefixes = ('ble::battery_service::', 'ble::report_writer::', 'ble::ble_server::tests::', 'usb::', 'ble::sleep::tests::',
+prefixes = ('ble::battery_service::', 'ble::report_writer::', 'ble::ble_server::tests::', 'ble::tests::', 'usb::', 'ble::sleep::tests::',
             'split::', 'keyboard::tests::',
             'keyboard::auto_mouse_layer::', 'keyboard::test::', 'host::via::', 'host::lock::', 'state::tests::',
             'input_device::pointing::', 'keymap::')

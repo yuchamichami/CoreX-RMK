@@ -11,9 +11,6 @@ import os
 from pathlib import Path
 
 os.environ.setdefault('QT_QPA_PLATFORM', 'offscreen')
-from PyQt5.QtGui import QColor, QFontDatabase, QImage, QPainter
-from PyQt5.QtSvg import QSvgRenderer
-from PyQt5.QtWidgets import QApplication
 
 ROOT = Path(__file__).resolve().parents[1]
 UNIT = 64
@@ -28,7 +25,7 @@ LABELS = {
     'KC_BSLASH': ['\\'], 'KC_SLASH': ['/'], 'KC_COMMA': [','], 'KC_DOT': ['.'],
     'KC_LEFT': ['←'], 'KC_RIGHT': ['→'], 'KC_UP': ['↑'], 'KC_DOWN': ['↓'],
     'KC_MUTE': ['消音'], 'KC_BTN3': ['中', 'クリック'],
-    'MO(1)': ['数字', 'Fn'], 'MO(4)': ['BT'], 'MO(6)': ['接続'],
+    'LT1(KC_LANG2)': ['英数', '長押しL1'], 'LT4(KC_LANG1)': ['かな', '長押しL4'], 'MO(6)': ['接続'],
     'LT3(KC_I)': ['I', '長押しScroll'],
 }
 
@@ -73,7 +70,7 @@ def make_svg():
     layer = preset['layout'][0]
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}">',
            '<title>CoreX 初期配列図</title>',
-           '<desc>Cornix 左と CoreX 右の基本配列。数字/Fn は数字レイヤー、BT は Bluetooth 設定、接続はPC切替などのレイヤー6。I を長押ししながらボールを回すとスクロール。</desc>',
+           '<desc>Cornix 左と CoreX 右の基本配列。英数は短押しで英数・長押しで数字レイヤー1、かなは短押しでかな・長押しでBluetooth設定レイヤー4。接続はPC切替などのレイヤー6。I を長押ししながらボールを回すとスクロール。</desc>',
            '<rect width="100%" height="100%" fill="#ffffff"/>',
            '<g font-family="Zen Maru Gothic">',
            svg_text(LEFT, 35, '初期配列', 25, 700, anchor='start'),
@@ -107,15 +104,18 @@ def make_svg():
     bx, by = RIGHT + outline['rx'] * UNIT, TOP + outline['ry'] * UNIT
     out.append(f'<circle cx="{bx:.2f}" cy="{by:.2f}" r="52" fill="#fafbfc" stroke="#89919b" stroke-width="1.5"/>')
     out.append(svg_text(bx, by + 6, 'トラックボール', 13))
-    out.append(svg_text(LEFT, 438, '数字 / Fn：数字・記号', 17, 400, '#535b65', 'start'))
-    out.append(svg_text(285, 438, 'BT：Bluetooth 設定', 17, 400, '#535b65', 'start'))
-    out.append(svg_text(535, 438, '接続：PC切替・登録', 17, 400, '#535b65', 'start'))
+    out.append(svg_text(LEFT, 438, '英数：長押しで数字・記号', 17, 400, '#535b65', 'start'))
+    out.append(svg_text(340, 438, 'かな：長押しで接続先', 17, 400, '#535b65', 'start'))
+    out.append(svg_text(640, 438, '接続：PC切替・登録', 17, 400, '#535b65', 'start'))
     out.append(svg_text(LEFT, 466, 'I を長押ししながらボールを回すとスクロール', 17, 400, '#535b65', 'start'))
     out.extend(['</g>', '</svg>'])
     return '\n'.join(out) + '\n'
 
 
 def main():
+    from PyQt5.QtGui import QColor, QFontDatabase, QImage, QPainter
+    from PyQt5.QtSvg import QSvgRenderer
+    from PyQt5.QtWidgets import QApplication
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--font-dir', type=Path, required=True)
     args = parser.parse_args()

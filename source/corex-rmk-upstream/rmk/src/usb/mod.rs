@@ -944,6 +944,8 @@ impl Handler for UsbDeviceHandler {
             // callbacks), don't overwrite — `configured()`/`enabled()` will resync.
             if current_usb_state() == UsbState::Suspended {
                 update_usb_writer_state(self.pre_suspend, false);
+                #[cfg(feature = "_ble")]
+                crate::ble::sleep::report_activity();
             }
             info!(
                 "Device resumed, the Vbus current limit is 500µA (or 2.5mA for high-power devices with remote wakeup enabled)."
@@ -967,6 +969,38 @@ mod tests {
 
     use super::{HidProtocolMode, OutResponse, UsbDeviceHandler, UsbRequestHandler};
     use crate::state::{current_usb_state, set_usb_state};
+
+    #[cfg(feature = "_ble")]
+    #[test]
+    fn host_resume_wakes_keyboard_without_a_key_or_ball_event() {
+        use embassy_futures::select::select;
+        use embassy_time::{Duration, Timer};
+        use crate::ble::sleep::{request_sleep, run_sleep_manager_for_test};
+        use crate::state::current_sleep_state;
+        use crate::test_support::test_block_on;
+
+        test_block_on(async {
+            let mut handler = UsbDeviceHandler::new();
+            handler.enabled(true);
+            handler.configured(true);
+            let script = async {
+                request_sleep();
+                Timer::after_millis(1).await;
+                assert!(current_sleep_state());
+                handler.suspended(true);
+                handler.suspended(false);
+                Timer::after_millis(1).await;
+                assert!(!current_sleep_state(), "a real host resume must wake the keyboard");
+                // A duplicate resume must not keep resetting the idle timer.
+                request_sleep();
+                Timer::after_millis(1).await;
+                handler.suspended(false);
+                Timer::after_millis(1).await;
+                assert!(current_sleep_state());
+            };
+            select(run_sleep_manager_for_test(Duration::from_secs(300)), script).await;
+        });
+    }
 
     /// A BIOS or KVM switch selects the boot protocol before it will use the
     /// keyboard; rejecting the switch strands a host that trusts the boot

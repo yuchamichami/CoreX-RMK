@@ -50,6 +50,54 @@ fn hold(service: &VialService<'_>, held: bool) {
     }
 }
 
+fn send_usb(service: &VialService<'_>, bytes: &[u8]) -> ViaReport {
+    let mut request = report(bytes);
+    embassy_futures::block_on(embassy_futures::select::select(
+        service.process_via_packet_from(&mut request, true),
+        crate::test_support::drain_flash_channel(),
+    ));
+    request
+}
+
+#[test]
+fn usb_tester_reads_layer_and_unassigned_positions_without_unlocking() {
+    with_service(|service| {
+        // Raytac device coordinates: L1, L4, L6 and the spare physical position.
+        // All actions in this test are No: the bitmap cannot depend on a HID code.
+        for (row, col) in [(7, 3), (7, 4), (3, 4), (3, 3)] {
+            service.ctx.keymap.update_matrix_state(&KeyboardEvent::key(row, col, true));
+        }
+        let matrix = send_usb(service, &[2, 3]);
+        assert_eq!(&matrix.input_data[..10], &[2, 3, 0, 0, 0, 24, 0, 0, 0, 24]);
+        assert!(matrix.input_data[10..].iter().all(|&n| n == 0));
+        assert!(!service.is_unlocked());
+        assert_eq!(send(service, &[2, 3]).input_data[0], 0xff, "BLE still needs unlock");
+        for (row, col) in [(7, 3), (7, 4), (3, 4), (3, 3)] {
+            service.ctx.keymap.update_matrix_state(&KeyboardEvent::key(row, col, false));
+        }
+        assert!(send_usb(service, &[2, 3]).input_data[2..].iter().all(|&n| n == 0));
+    });
+}
+
+#[test]
+fn usb_inspection_does_not_enable_writes_reset_or_a_physical_unlock() {
+    with_service(|service| {
+        send_usb(service, &[2, 3]);
+        for command in [0x0f, 0x10, 0x0a, 0x0b, 0x06] {
+            assert_eq!(send_usb(service, &[command, 0, 0, 1, b'z']).input_data[0], 0xff);
+        }
+        assert_eq!(send_usb(service, &[0xfe, 0x0c]).input_data[0], 0xff);
+        assert_eq!(send_usb(service, &[5, 0, 0, 1, 0x7c, 0]).input_data[0], 0xff);
+        assert_eq!(service.ctx.keymap.macros(|m| m.bytes()[0]), b'x');
+        assert!(!service.is_unlocked());
+        send(service, &[0xfe, 6]);
+        assert_eq!(send_usb(service, &[2, 3]).input_data[0], 0xff,
+                   "do not inspect during another client's physical challenge");
+        send(service, &[0xfe, 8]);
+        assert_eq!(send_usb(service, &[2, 3]).input_data[0], 2);
+    });
+}
+
 fn tick(service: &VialService<'_>) -> ViaReport {
     MockDriver::get().advance(Duration::from_millis(100));
     send(service, &[0xfe, 7])

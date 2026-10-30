@@ -362,21 +362,9 @@ async fn run_ble_keyboard<
                     }
                 }
                 Either::First(Err(BleHostError::BleHost(Error::Timeout))) => {
-                    warn!("Advertising timeout, sleep and wait for any key");
+                    warn!("Advertising timeout, waiting for input or profile change");
                     set_ble_state(BleState::Inactive);
-
-                    request_sleep();
-
-                    // Wake on key or pointing activity after the advertising
-                    // timeout. Subscribed here, not up front: a permanently
-                    // idle subscriber stalls `publish_event_async` once the
-                    // channel fills, and its backlog would satisfy this wait
-                    // instantly with a stale event.
-                    let mut key_wake = crate::event::KeyboardEvent::subscriber();
-                    let mut pointing_wake = crate::event::PointingEvent::subscriber();
-                    let _ = select(key_wake.next_message_pure(), pointing_wake.next_message_pure()).await;
-
-                    report_activity();
+                    wait_for_advertising_restart(profile_manager.update_profile()).await;
                 }
                 Either::First(Err(e)) => {
                     #[cfg(feature = "defmt")]
@@ -412,6 +400,24 @@ async fn run_ble_keyboard<
     )
     .await;
     unreachable!("BleTransport sub-tasks must run forever")
+}
+
+/// Keep profile changes serviced even after advertising has gone idle. A host
+/// command (e.g. over USB) need not produce a physical key or pointing event.
+/// Subscribe only during this wait so old input cannot cause a false wake and
+/// an unused subscriber cannot block asynchronous publishers.
+async fn wait_for_advertising_restart(profile_update: impl core::future::Future<Output = ()>) {
+    let mut key_wake = crate::event::KeyboardEvent::subscriber();
+    let mut pointing_wake = crate::event::PointingEvent::subscriber();
+    request_sleep();
+    // Poll profile work first: a simultaneous input must not cancel a queued
+    // profile change before it has even been polled.
+    let _ = select3(
+        profile_update,
+        key_wake.next_message_pure(),
+        pointing_wake.next_message_pure(),
+    ).await;
+    report_activity();
 }
 
 /// NoopHandler is used on the device which never scans,
@@ -1080,37 +1086,66 @@ mod tests {
     #[test]
     fn wake_activity_includes_pointing_events() {
         let _guard = ble_status_test_lock().lock().unwrap();
-
         block_on(async {
-            let wake = async {
-                let mut key_wake = KeyboardEvent::subscriber();
-                let mut pointing_wake = PointingEvent::subscriber();
-                let _ = select(key_wake.next_message_pure(), pointing_wake.next_message_pure()).await;
-            };
-            join(wake, async {
+            let wake = super::wait_for_advertising_restart(core::future::pending());
+            let script = async {
                 Timer::after_millis(1).await;
                 publish_event(PointingEvent {
-                    device_id: 0,
+                    device_id: 1,
                     axes: [
-                        AxisEvent {
-                            typ: AxisValType::Rel,
-                            axis: Axis::X,
-                            value: 1,
-                        },
-                        AxisEvent {
-                            typ: AxisValType::Rel,
-                            axis: Axis::Y,
-                            value: 0,
-                        },
-                        AxisEvent {
-                            typ: AxisValType::Rel,
-                            axis: Axis::Z,
-                            value: 0,
-                        },
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: 1 },
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::Y, value: 0 },
+                        AxisEvent { typ: AxisValType::Rel, axis: Axis::Z, value: 0 },
                     ],
-                })
-            })
-            .await;
+                });
+            };
+            assert!(embassy_time::with_timeout(
+                embassy_time::Duration::from_millis(20), join(wake, script)
+            ).await.is_ok());
         });
     }
+
+    #[test]
+    fn advertising_idle_services_profile_commands_without_physical_input() {
+        block_on(async {
+            use crate::ble::profile::BleProfileAction;
+            use crate::channel::BLE_PROFILE_CHANNEL;
+            BLE_PROFILE_CHANNEL.send(BleProfileAction::Switch(2)).await;
+            let apply = async {
+                match BLE_PROFILE_CHANNEL.receive().await {
+                    BleProfileAction::Switch(profile) => set_ble_profile(profile),
+                    _ => panic!("unexpected command"),
+                }
+            };
+            assert!(embassy_time::with_timeout(
+                embassy_time::Duration::from_millis(20),
+                super::wait_for_advertising_restart(apply),
+            ).await.is_ok());
+            assert_eq!(crate::state::current_profile(), 2);
+        });
+    }
+
+    #[test]
+    fn advertising_idle_ignores_old_input_and_wakes_on_a_new_left_key() {
+        block_on(async {
+            publish_event(KeyboardEvent::key(4, 0, true));
+            let start = embassy_time::Instant::now();
+            let wake = async {
+                super::wait_for_advertising_restart(core::future::pending()).await;
+                assert!(start.elapsed() >= embassy_time::Duration::from_millis(10),
+                        "input published before subscribing must not wake advertising");
+            };
+            let script = async {
+                Timer::after_millis(10).await;
+                publish_event(KeyboardEvent::key(4, 1, true));
+            };
+            let result = embassy_time::with_timeout(
+                embassy_time::Duration::from_millis(20),
+                join(wake, script),
+            ).await;
+            assert!(result.is_ok());
+            assert!(start.elapsed() >= embassy_time::Duration::from_millis(10));
+        });
+    }
+
 }

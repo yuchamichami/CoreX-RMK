@@ -24,7 +24,7 @@ BASE = [
     ['KC_TAB', 'KC_Q', 'KC_W', 'KC_E', 'KC_R', 'KC_T', 'KC_NO'],
     ['KC_CAPSLOCK', 'KC_A', 'KC_S', 'KC_D', 'KC_F', 'KC_G', 'KC_NO'],
     ['KC_LSHIFT', 'KC_Z', 'KC_X', 'KC_C', 'KC_V', 'KC_B', 'KC_MUTE'],
-    ['KC_LCTRL', 'KC_LGUI', 'KC_LALT', 'MO(1)', 'MO(4)', 'KC_SPACE', 'KC_NO'],
+    ['KC_LCTRL', 'KC_LGUI', 'KC_LALT', 'LT1(KC_LANG2)', 'LT4(KC_LANG1)', 'KC_SPACE', 'KC_NO'],
 ]
 
 # Normalize the public Vial spelling into the separate RMK vocabulary. This is
@@ -41,6 +41,7 @@ ALIASES = {
     'KC_SCOLON': 'Semicolon', 'KC_MINUS': 'Minus', 'KC_EQUAL': 'Equal',
     'KC_QUOTE': 'Quote', 'KC_WH_U': 'MouseWheelUp', 'KC_WH_D': 'MouseWheelDown',
     'KC_VOLU': 'AudioVolUp', 'KC_VOLD': 'AudioVolDown', 'LT3(KC_I)': 'LT(3,I)',
+    'LT1(KC_LANG2)': 'LT(1,Language2)', 'LT4(KC_LANG1)': 'LT(4,Language1)',
 }
 
 
@@ -146,8 +147,10 @@ class DefaultKeymapTests(unittest.TestCase):
                     self.assertEqual(token, normalize(preset[row][col]))
 
     def test_fn_targets_exist_without_changing_old_pointing_indices(self):
-        self.assertEqual(self.layers[0][7][3], 'MO(1)')
-        self.assertEqual(self.layers[0][7][4], 'MO(4)')
+        self.assertEqual(self.layers[0][7][3], 'LT1(KC_LANG2)')
+        self.assertEqual(self.layers[0][7][4], 'LT4(KC_LANG1)')
+        self.assertEqual(self.config['behavior']['morse']['hold_timeout'], '200ms')
+        self.assertTrue(self.config['behavior']['morse']['permissive_hold'])
         self.assertEqual(self.layers[0][3][3], 'MO(6)')
         for layer in self.layers:
             for row in layer:
@@ -155,6 +158,13 @@ class DefaultKeymapTests(unittest.TestCase):
                     match = re.fullmatch(r'MO\((\d+)\)', code)
                     if match:
                         self.assertLess(int(match[1]), len(self.layers))
+
+    def test_language_behavior_fixture_matches_production_defaults(self):
+        production = tomllib.loads((ROOT / 'source/corex-rmk-pair/right/keyboard-raytac.toml').read_text())
+        fixture = tomllib.loads((ROOT / 'source/corex-rmk-upstream/rmk/tests/scenarios/boards/corex-language-thumbs.toml').read_text())
+        for section in ('layout', 'keymap'):
+            self.assertEqual(fixture[section], production[section])
+        self.assertEqual(fixture['behavior']['morse'], production['behavior']['morse'])
 
     def test_update_does_not_request_storage_or_unrelated_preset_reset(self):
         storage = self.config['storage']

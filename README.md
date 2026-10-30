@@ -8,7 +8,7 @@ Cornixのケースに対応した交換基板向けのファームウェアで�
 
 ## 書き込み済みのセットを使う
 
-以下の登録手順とLED表示は、左右ともCoreX v0.11.4を書き込んだセット向けです。旧版が入っている場合は、左右とも更新してから進めてください。
+以下の登録手順とLED表示は、左右ともCoreX v0.11.4以降を書き込んだセット向けです。旧版が入っている場合は、左右とも更新してから進めてください。
 
 1. 左右の電源をONにします。
 2. **右側**をデータ通信対応のUSBケーブルでPCにつなぎます。左は無線で右につながります。
@@ -36,17 +36,23 @@ Bluetoothで使う場合は、[PCとの接続手順](docs/usage.md#bluetoothで�
 
 ## ファームウェアを更新する
 
-更新版は **v0.11.4のプレリリース**です。固定キーによる左右の登録とLEDの案内を追加しています。この版を書き込んだ実機での最終確認は未実施です。[検証状況](docs/validation.md)
+v0.11.6の初期配列は、左親指のL1が短押しで英数／長押しでレイヤー1、L4が短押しでかな／長押しでレイヤー4になります。保存済みの配列は更新だけでは変わりません。ブラウザー版KeyCheckの点検にも引き続き対応します。UF2は[CoreX Studioのファームページ](https://corex-studio.pages.dev/firmware)からも取得できます。[検証状況](docs/validation.md)
 
 [ダウンロード](firmware/)と[書き込み手順](docs/flashing.md)を確認してください。配布履歴は[Releases](https://github.com/yuchamichami/CoreX-RMK/releases)にまとめています。
 
 | 手元の基板 | ファイル名 |
 | --- | --- |
-| CoreX 右（R A14） | `CoreX-Right-v0.11.4-s140v6.uf2` または `s140v7` |
-| CoreX 左（L Rev1.0） | `CoreX-Left-v0.11.4-s140v6.uf2` または `s140v7` |
-| Cornix 純正左 | `Cornix-Stock-Left-v0.11.4.uf2` |
+| CoreX 右（R A14） | `CoreX-Right-v0.11.6-s140v6.uf2` または `s140v7` |
+| CoreX 左（L Rev1.0） | `CoreX-Left-v0.11.6-s140v6.uf2` または `s140v7` |
+| Cornix 純正左 | `Cornix-Stock-Left-v0.11.6.uf2` |
 
 **CoreX左用とCornix純正左用は別のファイルです。** `s140v6`／`s140v7`は本体のブートローダ情報に合わせて選びます。確認方法と更新後の操作は[書き込み手順](docs/flashing.md#ファイルを選ぶ)に記載しています。
+
+## KeyCheckでキーを点検する
+
+CoreX rev1.0の右側を更新し、ChromeまたはEdgeで[ブラウザー版KeyCheck](https://yuchamichami.github.io/key_check/)を開きます。「CoreXを接続」でUSB接続を許可すると点検が始まります。L1・L4・L6や未割り当てのキーも、押す・離すたびに表示されます。割り当てと通常のレイヤー操作は変わりません。
+
+許可済みの基板はUSBをつなぎ直すと自動で再接続します。未許可の基板は、本体ごとにブラウザーで選択が必要です。点検中はStudioとVialを閉じてください。左側がすでにCoreX用v0.11.4以降なら、この点検対応のための左側更新は不要です。
 
 ## 対応する基板と機能
 

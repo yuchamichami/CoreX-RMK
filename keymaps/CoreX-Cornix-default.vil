@@ -70,8 +70,8 @@
         "KC_LCTRL",
         "KC_LGUI",
         "KC_LALT",
-        "MO(1)",
-        "MO(4)",
+        "LT1(KC_LANG2)",
+        "LT4(KC_LANG1)",
         "KC_SPACE",
         "KC_NO"
       ]

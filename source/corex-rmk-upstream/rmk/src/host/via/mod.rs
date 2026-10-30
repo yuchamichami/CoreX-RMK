@@ -65,7 +65,12 @@ impl<'a> VialService<'a> {
         }
     }
 
+    #[cfg(test)]
     fn request_allowed(&self, request: &[u8; 32]) -> bool {
+        self.request_allowed_from(request, false)
+    }
+
+    fn request_allowed_from(&self, request: &[u8; 32], usb: bool) -> bool {
         #[cfg(feature = "host_lock")]
         if self.locker.is_unlocking() {
             // Freeze configuration while the physical challenge is held. Lock
@@ -89,16 +94,23 @@ impl<'a> VialService<'a> {
             | ViaCommand::BootloaderJump
             | ViaCommand::DynamicKeymapReset => self.is_unlocked(),
             ViaCommand::GetKeyboardValue if request[1] == ViaKeyboardInfo::SwitchMatrixState as u8 => {
-                cfg!(feature = "host_lock") && self.is_unlocked()
+                // USB inspection is read-only and must not unlock macro writes,
+                // reset or bootloader commands. BLE retains the physical lock.
+                cfg!(feature = "host_lock") && (usb || self.is_unlocked())
             }
             ViaCommand::Vial if request[1] == VialCommand::QmkSettingsReset as u8 => self.is_unlocked(),
             _ => true,
         }
     }
 
+    #[cfg(test)]
     async fn process_via_packet(&self, report: &mut ViaReport) {
+        self.process_via_packet_from(report, false).await;
+    }
+
+    async fn process_via_packet_from(&self, report: &mut ViaReport, usb: bool) {
         let command_id = report.output_data[0];
-        if !self.request_allowed(&report.output_data) {
+        if !self.request_allowed_from(&report.output_data, usb) {
             reject(report);
             return;
         }
@@ -126,7 +138,7 @@ impl<'a> VialService<'a> {
                             error!("It is not secure to use matrix tester without vial lock");
                         }
                         #[cfg(feature = "host_lock")]
-                        ViaKeyboardInfo::SwitchMatrixState if self.locker.is_unlocked() => {
+                        ViaKeyboardInfo::SwitchMatrixState if usb || self.locker.is_unlocked() => {
                             let bitmap = &mut report.input_data[2..];
                             bitmap.fill(0);
                             self.ctx.read_matrix_state(bitmap);
@@ -368,6 +380,16 @@ impl VialService<'_> {
     /// response, processed in place). Returns on any read/write error;
     /// transport-specific reconnect lives in the caller.
     pub async fn run_session<R: Read, T: Write>(&self, rx: &mut R, tx: &mut T) {
+        self.run_session_from(rx, tx, false).await;
+    }
+
+    /// USB-only matrix inspection. Transport provenance is supplied by the
+    /// USB adapter, never by a byte in an untrusted host request.
+    pub(crate) async fn run_usb_session<R: Read, T: Write>(&self, rx: &mut R, tx: &mut T) {
+        self.run_session_from(rx, tx, true).await;
+    }
+
+    async fn run_session_from<R: Read, T: Write>(&self, rx: &mut R, tx: &mut T, usb: bool) {
         let mut buf = [0u8; 32];
         loop {
             if rx.read_exact(&mut buf).await.is_err() {
@@ -377,7 +399,7 @@ impl VialService<'_> {
                 input_data: buf,
                 output_data: buf,
             };
-            self.process_via_packet(&mut report).await;
+            self.process_via_packet_from(&mut report, usb).await;
             if tx.write_all(&report.input_data).await.is_err() {
                 return;
             }

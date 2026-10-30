@@ -65,6 +65,9 @@ def generate():
         layout[layer][1][3] = 'KC_BTN3'
         layout[layer][1][2] = 'KC_BTN2'
     layout[0][0][3] = 'LT3(KC_I)'
+    # Tap switches the Mac input source; holding keeps the original Fn layers.
+    layout[0][7][3] = 'LT1(KC_LANG2)'
+    layout[0][7][4] = 'LT4(KC_LANG1)'
     for index, layer in enumerate(layout):
         # Virtual Vial settings have no physical switch.
         for (row, col), code in SETTINGS.items():
@@ -103,6 +106,7 @@ def rmk_action(code):
         'KC_MUTE': 'AudioMute', 'KC_BTN1': 'MouseBtn1', 'KC_BTN2': 'MouseBtn2',
         'KC_BTN3': 'MouseBtn3', 'KC_VOLD': 'AudioVolDown', 'KC_VOLU': 'AudioVolUp',
         'KC_WH_U': 'MouseWheelUp', 'KC_WH_D': 'MouseWheelDown', 'LT3(KC_I)': 'LT(3,I)',
+        'LT1(KC_LANG2)': 'LT(1,Language2)', 'LT4(KC_LANG1)': 'LT(4,Language1)',
     }
     if code in special:
         return special[code]

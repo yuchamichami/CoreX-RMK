@@ -998,45 +998,65 @@ async fn update_conn_params_on_sleep_change<
     stack: &'b Stack<'s, C, P>,
     conn: &Connection<'b, P>,
 ) -> Result<(), BleHostError<C::Error>> {
-    let mut sleep_events = SleepStateEvent::subscriber();
+    follow_sleep_connection_params(|sleeping| async move {
+        #[cfg(not(feature = "subrating"))]
+        {
+            let params = if sleeping {
+                sleep_split_conn_params()
+            } else {
+                default_split_conn_params()
+            };
+            update_conn_params(stack, conn, &params).await
+        }
+        #[cfg(feature = "subrating")]
+        {
+            let params = if sleeping {
+                subrating::sleep_split_subrating_params(conn.handle())
+            } else {
+                subrating::default_split_subrating_params(conn.handle())
+            };
+            subrating::update_subrate_factor(stack, params).await
+        }
+    }).await
+}
 
-    let mut sleeping = crate::state::current_sleep_state();
-    if !sleeping {
-        // Restart the idle timeout so service discovery isn't cut short. Asleep
-        // this isn't user activity, so discovery runs on the sleep parameters.
+/// Failed controller requests must be retried without waiting for another
+/// sleep/wake edge. Always consult the latched state: a wake may have happened
+/// while a sleep request was still in flight, leaving stale events queued.
+async fn follow_sleep_connection_params<F, Fut>(mut apply: F) -> !
+where
+    F: FnMut(bool) -> Fut,
+    Fut: core::future::Future<Output = bool>,
+{
+    let mut sleep_events = SleepStateEvent::subscriber();
+    if !crate::state::current_sleep_state() {
         report_activity();
     }
-
-    let mut sleeping_conn_param_applied = false;
-
+    // New links use default_split_conn_params in ConnectConfig.
+    let mut applied = false;
+    let mut retry_seconds = 1;
     loop {
-        if sleeping != sleeping_conn_param_applied {
-            #[cfg(not(feature = "subrating"))]
-            let sent = {
-                let params = if sleeping {
-                    sleep_split_conn_params()
-                } else {
-                    default_split_conn_params()
-                };
-                update_conn_params(stack, conn, &params).await
-            };
-
-            #[cfg(feature = "subrating")]
-            let sent = {
-                let params = if sleeping {
-                    subrating::sleep_split_subrating_params(conn.handle())
-                } else {
-                    subrating::default_split_subrating_params(conn.handle())
-                };
-                subrating::update_subrate_factor(stack, params).await
-            };
-
-            if sent {
-                sleeping_conn_param_applied = sleeping;
-            }
+        let sleeping = crate::state::current_sleep_state();
+        if sleeping != applied && apply(sleeping).await {
+            applied = sleeping;
+            retry_seconds = 1;
         }
-
-        sleeping = sleep_events.next_event().await.0;
+        if crate::state::current_sleep_state() != sleeping {
+            retry_seconds = 1;
+            continue;
+        }
+        if sleeping != applied {
+            // Persistent rejection must not keep issuing a request every
+            // second forever. A new sleep/wake state interrupts the backoff.
+            let _ = select(sleep_events.next_event(), Timer::after_secs(retry_seconds)).await;
+            retry_seconds = if crate::state::current_sleep_state() != sleeping {
+                1
+            } else {
+                (retry_seconds * 2).min(30)
+            };
+        } else {
+            sleep_events.next_event().await;
+        }
     }
 }
 
@@ -1047,6 +1067,52 @@ mod tests {
     use super::*;
     use crate::ble::sleep::SLEEPING_STATE;
     use crate::test_support::test_block_on as block_on;
+
+    #[test]
+    fn failed_wake_parameters_retry_without_another_input_event() {
+        block_on(async {
+            let attempts = RefCell::new(std::vec::Vec::new());
+            SLEEPING_STATE.store(true, Ordering::Release);
+            let follower = follow_sleep_connection_params(|sleeping| {
+                attempts.borrow_mut().push(sleeping);
+                let successful = sleeping || attempts.borrow().iter().filter(|&&s| !s).count() >= 3;
+                core::future::ready(successful)
+            });
+            let script = async {
+                Timer::after_millis(10).await;
+                SLEEPING_STATE.store(false, Ordering::Release);
+                crate::event::publish_event(SleepStateEvent::new(false));
+                Timer::after_millis(3100).await;
+                assert_eq!(*attempts.borrow(), [true, false, false, false]);
+                Timer::after_secs(2).await;
+                assert_eq!(attempts.borrow().len(), 4, "stop retrying after success");
+            };
+            select(follower, script).await;
+        });
+    }
+
+    #[test]
+    fn wake_during_sleep_parameter_request_skips_stale_sleep_events() {
+        block_on(async {
+            let attempts = RefCell::new(std::vec::Vec::new());
+            SLEEPING_STATE.store(true, Ordering::Release);
+            let attempts_ref = &attempts;
+            let follower = follow_sleep_connection_params(|sleeping| async move {
+                attempts_ref.borrow_mut().push(sleeping);
+                Timer::after_millis(100).await;
+                true
+            });
+            let script = async {
+                Timer::after_millis(10).await;
+                crate::event::publish_event(SleepStateEvent::new(true));
+                SLEEPING_STATE.store(false, Ordering::Release);
+                crate::event::publish_event(SleepStateEvent::new(false));
+                Timer::after_millis(300).await;
+                assert_eq!(*attempts.borrow(), [true, false]);
+            };
+            select(follower, script).await;
+        });
+    }
 
     #[test]
     fn repeated_awake_or_sleeping_timeouts_keep_the_known_peer() {

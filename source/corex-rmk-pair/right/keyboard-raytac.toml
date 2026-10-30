@@ -35,7 +35,7 @@ User11 User26 User17 MouseBtn3
 Tab Q W E R T No
 CapsLock A S D F G No
 LShift Z X C V B AudioMute
-LCtrl LGui LAlt MO(1) MO(4) Space No
+LCtrl LGui LAlt LT(1,Language2) LT(4,Language1) Space No
 """
 encoders = [["MouseWheelDown", "MouseWheelUp"], ["AudioVolUp", "AudioVolDown"]]
 [[keymap.layer]]

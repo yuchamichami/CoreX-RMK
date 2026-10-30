@@ -1522,8 +1522,8 @@ mod tests {
         let positional = PositionalConfig::<1, 1>::default();
         let keymap = block_on(KeyMap::new(&mut data, &mut behavior, &positional));
         let mut processor = PointingProcessor::new(&keymap, PointingProcessorConfig::default());
-        let motion = |x, y| PointingEvent {
-            device_id: 0,
+        let motion = |device_id, x, y| PointingEvent {
+            device_id,
             axes: [
                 AxisEvent { typ: AxisValType::Rel, axis: Axis::X, value: x },
                 AxisEvent { typ: AxisValType::Rel, axis: Axis::Y, value: y },
@@ -1535,20 +1535,22 @@ mod tests {
             select(
                 crate::ble::sleep::run_sleep_manager_for_test(Duration::from_millis(100)),
                 async {
-                    Timer::after_millis(110).await;
-                    assert!(crate::state::current_sleep_state());
-                    processor.on_pointing_event(motion(0, 0)).await;
-                    Timer::after_millis(1).await;
-                    assert!(!crate::state::current_sleep_state(), "sub-pixel activity must wake sleep");
-                    assert!(USB_REPORT_CHANNEL.try_receive().is_err(), "zero movement must not send HID");
+                    for device_id in [0, 1] {
+                        Timer::after_millis(110).await;
+                        assert!(crate::state::current_sleep_state());
+                        processor.on_pointing_event(motion(device_id, 0, 0)).await;
+                        Timer::after_millis(1).await;
+                        assert!(!crate::state::current_sleep_state(), "sub-pixel activity must wake sleep");
+                        assert!(USB_REPORT_CHANNEL.try_receive().is_err(), "zero movement must not send HID");
 
-                    processor.on_pointing_event(motion(1, -1)).await;
-                    let Report::MouseReport(report) = USB_REPORT_CHANNEL.try_receive().unwrap() else {
-                        panic!("expected the first cursor report");
+                        processor.on_pointing_event(motion(device_id, 1, -1)).await;
+                        let Report::MouseReport(report) = USB_REPORT_CHANNEL.try_receive().unwrap() else {
+                            panic!("expected the first cursor report");
                     };
                     assert_eq!((report.x, report.y), (1, -1));
                     assert_eq!((report.buttons, report.wheel, report.pan), (0, 0, 0));
                     assert!(USB_REPORT_CHANNEL.try_receive().is_err(), "first delta must be sent once");
+                    }
                 },
             ).await;
         });

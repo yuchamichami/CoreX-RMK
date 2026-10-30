@@ -1,0 +1,42 @@
+# Tap language keys and hold original CoreX thumb layers, with production timing.
+keyboard = "boards/corex-language-thumbs.toml"
+
+[[test]]
+name = "tap_eisu"
+steps = [{ tap = { pos = [7, 3], duration = 30 } }]
+expect = [["Language2"], []]
+
+[[test]]
+name = "tap_kana"
+steps = [{ tap = { pos = [7, 4], duration = 30 } }]
+expect = [["Language1"], []]
+
+[[test]]
+name = "hold_numbers_then_return_to_base"
+steps = [{ press = [7, 3] }, { delay = 220 }, { tap = { pos = [4, 1], duration = 30 } }, { release = [7, 3] }, { tap = { pos = [4, 1], duration = 30 } }]
+expect = [["Kc1"], [], ["Q"], []]
+
+[[test]]
+name = "quick_nested_number_chord_sends_no_eisu"
+steps = [{ press = [7, 3] }, { tap = { pos = [4, 1], duration = 10 } }, { release = [7, 3] }]
+expect = [["Kc1"], []]
+
+[[test]]
+name = "hold_connection_layer_then_return_to_base"
+steps = [{ press = [7, 4] }, { delay = 220 }, { tap = { pos = [4, 1], duration = 30 } }, { release = [7, 4] }, { tap = { pos = [4, 1], duration = 30 } }]
+expect = [["Q"], []]
+
+[[test]]
+name = "quick_nested_connection_chord_sends_no_kana"
+steps = [{ press = [7, 4] }, { tap = { pos = [4, 1], duration = 10 } }, { release = [7, 4] }, { tap = { pos = [4, 1], duration = 30 } }]
+expect = [["Q"], []]
+
+[[test]]
+name = "release_layer_before_number_does_not_stick"
+steps = [{ press = [7, 3] }, { delay = 220 }, { press = [4, 1] }, { release = [7, 3] }, { release = [4, 1] }, { tap = { pos = [4, 1], duration = 30 } }]
+expect = [["Kc1"], [], ["Q"], []]
+
+[[test]]
+name = "hold_without_other_key_sends_no_language"
+steps = [{ press = [7, 3] }, { delay = 220 }, { release = [7, 3] }, { press = [7, 4] }, { delay = 220 }, { release = [7, 4] }]
+expect = []

@@ -1,6 +1,6 @@
 [package]
 name = "corex-pair-right"
-version = "0.11.6"
+version = "0.11.7"
 authors = ["Haobo Gu <haobogu@outlook.com>"]
 description = "CoreX right central: keyboard and dual-port PAW3222 trackball"
 homepage = "https://github.com/yuchamichami/CoreX-RMK"

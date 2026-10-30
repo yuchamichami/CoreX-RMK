@@ -33,7 +33,7 @@ names = [line.removesuffix(': test') for line in
 prefixes = ('ble::battery_service::', 'ble::report_writer::', 'ble::ble_server::tests::', 'ble::tests::', 'usb::', 'ble::sleep::tests::',
             'split::', 'keyboard::tests::',
             'keyboard::auto_mouse_layer::', 'keyboard::test::', 'host::via::', 'host::lock::', 'state::tests::',
-            'input_device::pointing::', 'keymap::')
+            'input_device::pointing::', 'keymap::', 'storage::factory_reset_tests::')
 selected = [name for name in names if name.startswith(prefixes)]
 assert selected, 'No host regression tests selected'
 for name in selected:

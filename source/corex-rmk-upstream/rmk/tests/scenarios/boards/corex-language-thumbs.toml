@@ -28,7 +28,7 @@ keys = """
 Y U LT(3,I) O P Backspace
 H J K L Backslash Enter
 N M Comma Dot Up Slash
-Space MO(6) No Left Down Right
+Space LT(6,F13) F14 Left Down Right
 User11 User26 User17 MouseBtn3
 Tab Q W E R T No
 CapsLock A S D F G No
@@ -56,7 +56,7 @@ keys = """
 _ _ _ _ _ _
 _ MouseBtn1 MouseBtn3 MouseBtn2 _ _
 _ _ _ _ _ _
-_ _ No _ _ _
+_ _ _ _ _ _
 No No No _
 _ _ _ _ _ _ No
 _ _ _ _ _ _ No
@@ -70,7 +70,7 @@ keys = """
 _ _ _ _ _ _
 _ MouseBtn1 MouseBtn3 MouseBtn2 _ _
 _ _ _ _ _ _
-_ _ No _ _ _
+_ _ _ _ _ _
 No No No _
 _ _ _ _ _ _ No
 _ _ _ _ _ _ No

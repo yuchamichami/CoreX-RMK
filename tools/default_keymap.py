@@ -29,7 +29,7 @@ def stock_position(row, col):
     if (row, col) == (5, 6):  # Right encoder push.
         return 0, 5
     if row == 7:
-        if col == 3:  # No switch here: occupied by the trackball.
+        if col == 3:  # Covered by the trackball; assign its inspection key below.
             return None
         if col == 4:
             return 3, 3
@@ -68,13 +68,19 @@ def generate():
     # Tap switches the Mac input source; holding keeps the original Fn layers.
     layout[0][7][3] = 'LT1(KC_LANG2)'
     layout[0][7][4] = 'LT4(KC_LANG1)'
+    layout[0][3][3] = 'LT6(KC_F13)'
     for index, layer in enumerate(layout):
         # Virtual Vial settings have no physical switch.
         for (row, col), code in SETTINGS.items():
             layer[row][col] = code if index == 0 else 'KC_NO'
         for row, col in [(3, 6), (4, 6), (5, 6), (7, 6)]:
             layer[row][col] = 'KC_NO'
-    # Right thumb Fn (MO6) provides host controls without the left half.
+    # The switch covered by the trackball is scan [3,3], canonical [3,6].
+    # Give it an ordinary keyboard report even while auto-mouse is active.
+    layout[0][3][6] = 'KC_F14'
+    for layer in (2, 3):
+        layout[layer][3][6] = 'KC_TRNS'
+    # Right thumb Fn provides host controls without the left half.
     # Keep stock typing/number layers unchanged. Erasure uses a dedicated hold.
     for row, col, code in [(3,4,'USER00'), (0,4,'USER01'), (0,3,'USER02'),
                            (0,2,'USER03'), (0,1,'USER06'), (0,0,'USER05'),
@@ -107,6 +113,7 @@ def rmk_action(code):
         'KC_BTN3': 'MouseBtn3', 'KC_VOLD': 'AudioVolDown', 'KC_VOLU': 'AudioVolUp',
         'KC_WH_U': 'MouseWheelUp', 'KC_WH_D': 'MouseWheelDown', 'LT3(KC_I)': 'LT(3,I)',
         'LT1(KC_LANG2)': 'LT(1,Language2)', 'LT4(KC_LANG1)': 'LT(4,Language1)',
+        'LT6(KC_F13)': 'LT(6,F13)', 'KC_F14': 'F14',
     }
     if code in special:
         return special[code]

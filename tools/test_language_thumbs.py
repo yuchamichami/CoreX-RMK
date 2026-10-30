@@ -21,9 +21,9 @@ assert len(executables) == 1, executables
 executable = executables[0]
 names = [line.removesuffix(": test") for line in subprocess.check_output(
     [executable, "--list", "--format", "terse"], text=True).splitlines()
-    if line.startswith("corex_language_thumbs::") and line.endswith(": test")]
-assert len(names) == 8, names
+    if line.startswith(("corex_language_thumbs::", "corex_right_inspection::")) and line.endswith(": test")]
+assert len(names) == 14, names
 for name in names:
     subprocess.run([executable, "--exact", name], check=True,
                    env={**os.environ, "RMK_TEST_PROCESS_ISOLATED": "1"})
-print("PASS 8 CoreX language thumb input/output scenarios in separate processes")
+print("PASS 14 CoreX language/inspection input/output scenarios in separate processes")

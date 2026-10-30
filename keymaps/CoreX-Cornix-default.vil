@@ -34,10 +34,10 @@
         "KC_RIGHT",
         "KC_DOWN",
         "KC_LEFT",
-        "MO(6)",
+        "LT6(KC_F13)",
         "KC_Y",
         "KC_SPACE",
-        "KC_NO"
+        "KC_F14"
       ],
       [
         "KC_TAB",
@@ -185,7 +185,7 @@
         "KC_TRNS",
         "KC_TRNS",
         "KC_TRNS",
-        "KC_NO"
+        "KC_TRNS"
       ],
       [
         "KC_TRNS",
@@ -259,7 +259,7 @@
         "KC_TRNS",
         "KC_TRNS",
         "KC_TRNS",
-        "KC_NO"
+        "KC_TRNS"
       ],
       [
         "KC_TRNS",

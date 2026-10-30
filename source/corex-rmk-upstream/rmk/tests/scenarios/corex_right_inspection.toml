@@ -1,0 +1,31 @@
+keyboard = "boards/corex-language-thumbs.toml"
+
+[[test]]
+name = "tap_right_layer_sends_f13"
+steps = [{ tap = { pos = [3, 4], duration = 30 } }]
+expect = [["F13"], []]
+
+[[test]]
+name = "hold_right_layer_sends_no_f13_and_restores_base"
+steps = [{ press = [3, 4] }, { delay = 220 }, { tap = { pos = [0, 5], duration = 30 } }, { release = [3, 4] }, { tap = { pos = [0, 5], duration = 30 } }]
+expect = [["Y"], []]
+
+[[test]]
+name = "quick_nested_right_layer_sends_no_f13"
+steps = [{ press = [3, 4] }, { tap = { pos = [0, 5], duration = 10 } }, { release = [3, 4] }, { tap = { pos = [0, 5], duration = 30 } }]
+expect = [["Y"], []]
+
+[[test]]
+name = "hold_right_layer_alone_sends_nothing"
+steps = [{ press = [3, 4] }, { delay = 5200 }, { release = [3, 4] }]
+expect = []
+
+[[test]]
+name = "covered_switch_sends_f14_on_press_and_release"
+steps = [{ press = [3, 3] }, { delay = 250 }, { release = [3, 3] }, { tap = { pos = [3, 3], duration = 20 } }]
+expect = [["F14"], [], ["F14"], []]
+
+[[test]]
+name = "covered_switch_also_works_on_scroll_layer"
+steps = [{ press = [0, 3] }, { delay = 220 }, { tap = { pos = [3, 3], duration = 30 } }, { release = [0, 3] }]
+expect = [["F14"], []]

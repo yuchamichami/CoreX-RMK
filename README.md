@@ -36,23 +36,25 @@ Bluetoothで使う場合は、[PCとの接続手順](docs/usage.md#bluetoothで�
 
 ## ファームウェアを更新する
 
-v0.11.6の初期配列は、左親指のL1が短押しで英数／長押しでレイヤー1、L4が短押しでかな／長押しでレイヤー4になります。保存済みの配列は更新だけでは変わりません。ブラウザー版KeyCheckの点検にも引き続き対応します。UF2は[CoreX Studioのファームページ](https://corex-studio.pages.dev/firmware)からも取得できます。[検証状況](docs/validation.md)
+v0.11.7の初期配列では、右のL6を短押しするとF13、長押しするとレイヤー6になります。トラボ裏のスイッチはF14です。左の英数・かな兼用は維持します。保存済みの配列は更新だけでは変わりません。UF2は[CoreX Studioのファームページ](https://corex-studio.pages.dev/firmware)からも取得できます。[検証状況](docs/validation.md)
 
 [ダウンロード](firmware/)と[書き込み手順](docs/flashing.md)を確認してください。配布履歴は[Releases](https://github.com/yuchamichami/CoreX-RMK/releases)にまとめています。
 
 | 手元の基板 | ファイル名 |
 | --- | --- |
-| CoreX 右（R A14） | `CoreX-Right-v0.11.6-s140v6.uf2` または `s140v7` |
-| CoreX 左（L Rev1.0） | `CoreX-Left-v0.11.6-s140v6.uf2` または `s140v7` |
-| Cornix 純正左 | `Cornix-Stock-Left-v0.11.6.uf2` |
+| CoreX 右（R A14） | `CoreX-Right-v0.11.7-s140v6.uf2` または `s140v7` |
+| CoreX 左（L Rev1.0） | `CoreX-Left-v0.11.7-s140v6.uf2` または `s140v7` |
+| Cornix 純正左 | `Cornix-Stock-Left-v0.11.7.uf2` |
 
 **CoreX左用とCornix純正左用は別のファイルです。** `s140v6`／`s140v7`は本体のブートローダ情報に合わせて選びます。確認方法と更新後の操作は[書き込み手順](docs/flashing.md#ファイルを選ぶ)に記載しています。
 
 ## KeyCheckでキーを点検する
 
-CoreX rev1.0の右側を更新し、ChromeまたはEdgeで[ブラウザー版KeyCheck](https://yuchamichami.github.io/key_check/)を開きます。「CoreXを接続」でUSB接続を許可すると点検が始まります。L1・L4・L6や未割り当てのキーも、押す・離すたびに表示されます。割り当てと通常のレイヤー操作は変わりません。
+初期配列では、[ブラウザー版KeyCheck](https://yuchamichami.github.io/key_check/)を開いて右をUSB接続するだけで、右のL6は短押しでF13、トラボ裏のスイッチはF14として反応します。特別な点検モードやUSB接続の許可は不要です。L6を長押しすると、従来どおり接続操作のレイヤー6を使えます。
 
-許可済みの基板はUSBをつなぎ直すと自動で再接続します。未許可の基板は、本体ごとにブラウザーで選択が必要です。点検中はStudioとVialを閉じてください。左側がすでにCoreX用v0.11.4以降なら、この点検対応のための左側更新は不要です。
+保存済みの配列がある本体は、ファーム更新後も元の割り当てが残ります。[初期配列ファイル](keymaps/README.md)を読み込むか、設定を初期化してから点検してください。左用ファームの更新は不要です。
+
+割り当てと無関係に物理キーを読み取りたい場合は、ChromeまたはEdgeの「CoreXを接続」も使えます。この方法だけは本体ごとに接続許可が必要です。点検中はStudioとVialを閉じてください。
 
 ## 対応する基板と機能
 

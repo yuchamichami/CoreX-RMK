@@ -619,6 +619,9 @@ pub(crate) async fn drain_flash_channel() {
     }
 }
 
+#[cfg(all(test, feature = "host", feature = "_ble", feature = "split"))]
+mod factory_reset_tests;
+
 #[cfg(test)]
 mod tests {
     use core::future::Future;

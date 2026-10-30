@@ -25,7 +25,7 @@ LABELS = {
     'KC_BSLASH': ['\\'], 'KC_SLASH': ['/'], 'KC_COMMA': [','], 'KC_DOT': ['.'],
     'KC_LEFT': ['←'], 'KC_RIGHT': ['→'], 'KC_UP': ['↑'], 'KC_DOWN': ['↓'],
     'KC_MUTE': ['消音'], 'KC_BTN3': ['中', 'クリック'],
-    'LT1(KC_LANG2)': ['英数', '長押しL1'], 'LT4(KC_LANG1)': ['かな', '長押しL4'], 'MO(6)': ['接続'],
+    'LT1(KC_LANG2)': ['英数', '長押しL1'], 'LT4(KC_LANG1)': ['かな', '長押しL4'], 'LT6(KC_F13)': ['F13', '長押しL6'],
     'LT3(KC_I)': ['I', '長押しScroll'],
 }
 

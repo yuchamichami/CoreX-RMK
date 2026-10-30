@@ -29,9 +29,12 @@ def main():
     for half in ['right', 'left', 'stock-left']:
         target = ROOT / 'build/target' / half
         verify_rebuilt_schema(ROOT, target, manifest, required=True)
-        metadata = max(target.glob('thumbv7em-none-eabihf/release/build/rmk-*/output'),
+        metadata = max((p for p in target.glob('thumbv7em-none-eabihf/release/build/rmk-*/output')
+                        if re.fullmatch(r'rmk-[0-9a-f]+', p.parent.name)),
                        key=lambda p: p.stat().st_mtime).read_text()
         require(f'cargo:rustc-env=COREX_FIRMWARE_VERSION={version}\n' in metadata, 'Stale compiled version')
+        expected_board = {'right': 'raytac-r-a14', 'left': 'raytac-l-rev1', 'stock-left': 'prototype'}[half]
+        require(f'cargo:rustc-env=COREX_BOARD={expected_board}\n' in metadata, 'Stale compiled board')
     generated = max((ROOT / 'build/target/right').glob(
         'thumbv7em-none-eabihf/release/build/corex-pair-right-*/out/config_generated.rs'),
         key=lambda p: p.stat().st_mtime)

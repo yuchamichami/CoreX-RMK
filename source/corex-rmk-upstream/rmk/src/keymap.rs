@@ -1,3 +1,7 @@
+#[cfg(all(feature = "storage", feature = "host"))]
+#[path = "storage/covered_switch.rs"]
+mod covered_switch;
+
 use core::cell::RefCell;
 
 use embassy_time::Duration;
@@ -465,6 +469,11 @@ impl<'a> KeyMap<'a> {
                 error!("Failed to read from storage, clearing...");
                 storage.flash.erase_all().await.ok();
                 reboot_keyboard();
+            }
+            if covered_switch::eligible(env!("COREX_BOARD"), ROW, COL, NUM_LAYER) {
+                if covered_switch::migrate(storage, data).await.is_err() {
+                    error!("Covered-switch migration was not saved; retrying on next boot");
+                }
             }
         }
 

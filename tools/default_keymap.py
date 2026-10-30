@@ -77,7 +77,7 @@ def generate():
             layer[row][col] = 'KC_NO'
     # The switch covered by the trackball is scan [3,3], canonical [3,6].
     # Give it an ordinary keyboard report even while auto-mouse is active.
-    layout[0][3][6] = 'KC_F14'
+    layout[0][3][6] = 'KC_SPACE'
     for layer in (2, 3):
         layout[layer][3][6] = 'KC_TRNS'
     # Right thumb Fn provides host controls without the left half.
@@ -113,7 +113,7 @@ def rmk_action(code):
         'KC_BTN3': 'MouseBtn3', 'KC_VOLD': 'AudioVolDown', 'KC_VOLU': 'AudioVolUp',
         'KC_WH_U': 'MouseWheelUp', 'KC_WH_D': 'MouseWheelDown', 'LT3(KC_I)': 'LT(3,I)',
         'LT1(KC_LANG2)': 'LT(1,Language2)', 'LT4(KC_LANG1)': 'LT(4,Language1)',
-        'LT6(KC_F13)': 'LT(6,F13)', 'KC_F14': 'F14',
+        'LT6(KC_F13)': 'LT(6,F13)',
     }
     if code in special:
         return special[code]

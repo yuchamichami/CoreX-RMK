@@ -398,7 +398,7 @@ impl<F: AsyncNorFlash, const ROW: usize, const COL: usize, const NUM_LAYER: usiz
     }
 
     // Like `store`: split first so the future holds the pair, not the pair and `item`.
-    fn put(&mut self, item: StorageItem) -> impl Future<Output = Result<(), SSError<F::Error>>> {
+    pub(crate) fn put(&mut self, item: StorageItem) -> impl Future<Output = Result<(), SSError<F::Error>>> {
         let (key, value) = item.split();
         async move {
             self.flash

@@ -25,6 +25,8 @@ fn main() {
     // It changes no serialized StorageValue variant or field. Keep existing
     // CoreX layouts and bonds when enabling this runtime-only feature.
     features.retain(|feature| feature != "host_lock");
+    println!("cargo:rerun-if-env-changed=COREX_BOARD");
+    println!("cargo:rustc-env=COREX_BOARD={}", std::env::var("COREX_BOARD").unwrap_or_default());
     println!("cargo:rerun-if-env-changed=COREX_FIRMWARE_VERSION");
     let version = std::env::var("COREX_FIRMWARE_VERSION").unwrap_or_else(|_| "0.0.0".into());
     let parts: Vec<u32> = version.split('.').map(|v| v.parse().expect("numeric CoreX version")).collect();

@@ -1,6 +1,6 @@
 {
   "distribution": "CoreX / Cornix TB",
-  "release": "v0.11.7",
+  "release": "v0.11.8",
   "rust_toolchain": "1.95.0",
   "target": "thumbv7em-none-eabihf",
   "rmk_base_commit": "8a6889854fb996be592c55075b385234133e1772",
@@ -14,58 +14,58 @@
   "images": [
     {
       "side": "raytac-right-26000",
-      "filename": "CoreX-Right-v0.11.7-s140v6.uf2",
-      "application_version": "0.11.7",
-      "binary_bytes": 545476,
-      "binary_sha256": "9b306f20fc874a6f2ee8bd871cbfd6cd67f033b452389558ed47bd3517e0535b",
-      "uf2_sha256": "53523cb0865ac43b22256d1ce58db9ce9b2d97eeebb509da2dfad8a53afbcafe",
+      "filename": "CoreX-Right-v0.11.8-s140v6.uf2",
+      "application_version": "0.11.8",
+      "binary_bytes": 546836,
+      "binary_sha256": "1aa46b277e9da8b6365c85aabb1790b5ab519ed342e2a88fd8016aa3800afd5d",
+      "uf2_sha256": "af14576693303f0502b4912012062c4e388312f8698abde7888f3ae6ccd77480",
       "flash_start": "0x26000",
-      "flash_end_exclusive": "0xab300"
+      "flash_end_exclusive": "0xab900"
     },
     {
       "side": "raytac-right-27000",
-      "filename": "CoreX-Right-v0.11.7-s140v7.uf2",
-      "application_version": "0.11.7",
-      "binary_bytes": 545476,
-      "binary_sha256": "6cbb532b49527fed7d7b6e974ce825fba10ee2b61aed4e720c0f6684cab7ba17",
-      "uf2_sha256": "dcad01fd719095ae54802b77bf61d38bfb1d963f8afd70584f93f1bb926e7425",
+      "filename": "CoreX-Right-v0.11.8-s140v7.uf2",
+      "application_version": "0.11.8",
+      "binary_bytes": 546836,
+      "binary_sha256": "a9613db2af43e00814062dd3562f3e970e23e501814bdf0ecd8dd596afad9732",
+      "uf2_sha256": "d4598f99fcbc02d8e6f0c9732840f9f55473c7ffbda02e8227fd89665cfca012",
       "flash_start": "0x27000",
-      "flash_end_exclusive": "0xac300"
+      "flash_end_exclusive": "0xac900"
     },
     {
       "side": "raytac-left-26000",
-      "filename": "CoreX-Left-v0.11.7-s140v6.uf2",
-      "application_version": "0.11.7",
+      "filename": "CoreX-Left-v0.11.8-s140v6.uf2",
+      "application_version": "0.11.8",
       "binary_bytes": 352580,
-      "binary_sha256": "6b4156ea5c15f7fb919dfdf43fda7f06c42a216014d35b40bf382d9e5a36d2ad",
-      "uf2_sha256": "c0f40296e2193ec7cca4654815b720ecc092f2dcb4738065eb29f1b6aec20f4c",
+      "binary_sha256": "1547dd8a0cd93177d6c50721e7d4f7ab78f5e2ebe7aba12b6870082568604a8f",
+      "uf2_sha256": "c0ee1f174513e0631df3a6a65f7ae872060bb100d026e8fe5a54e61a9f011966",
       "flash_start": "0x26000",
       "flash_end_exclusive": "0x7c200"
     },
     {
       "side": "raytac-left-27000",
-      "filename": "CoreX-Left-v0.11.7-s140v7.uf2",
-      "application_version": "0.11.7",
+      "filename": "CoreX-Left-v0.11.8-s140v7.uf2",
+      "application_version": "0.11.8",
       "binary_bytes": 352580,
-      "binary_sha256": "53d5becf55f1899ef0607536f1169344c424bb349f6a23766d0474b1bccbd7ee",
-      "uf2_sha256": "2741771af5dffc5f33553819efb35ca18aaf552827c96131ce017d7c2d47fe75",
+      "binary_sha256": "fd3e4f36848e7280446456c45a4e4d040b1d7b82970c5f22d6f7d563bd30dec2",
+      "uf2_sha256": "8445cf253801a0eb03c46aaed726ceba76606463ab8ba1fd3a6a9e3ad9cbc476",
       "flash_start": "0x27000",
       "flash_end_exclusive": "0x7d200"
     },
     {
       "side": "left",
-      "filename": "Cornix-Stock-Left-v0.11.7.uf2",
-      "application_version": "0.11.7",
-      "binary_bytes": 352716,
-      "binary_sha256": "2dcd2f09a6880a27fb180c564f4f24e456ae99199bfe1677d26c9ed523e3a5f7",
-      "uf2_sha256": "7c02cae1deabd8b22efa74437a43628ad741b46ba87e27b571906940dc354065",
+      "filename": "Cornix-Stock-Left-v0.11.8.uf2",
+      "application_version": "0.11.8",
+      "binary_bytes": 352708,
+      "binary_sha256": "beace7e0cd066d62206620c43fc0e6541ee80bea3f6fbb5392a73cc97a0c3667",
+      "uf2_sha256": "aa32c6d1859d5b66d4936dc3bc13fb93abb4d9f9a2d8813de3ce4c951d25afd0",
       "flash_start": "0x1000",
       "flash_end_exclusive": "0x57200"
     }
   ],
   "configuration_profile": {
     "uid": "436f726558525931",
-    "firmware": 2823,
+    "firmware": 2824,
     "pointingDevices": [
       "trackball"
     ],

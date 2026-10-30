@@ -30,7 +30,7 @@ keys = """
 Y U LT(3,I) O P Backspace
 H J K L Backslash Enter
 N M Comma Dot Up Slash
-Space LT(6,F13) F14 Left Down Right
+Space LT(6,F13) Space Left Down Right
 User11 User26 User17 MouseBtn3
 Tab Q W E R T No
 CapsLock A S D F G No

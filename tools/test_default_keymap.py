@@ -20,7 +20,7 @@ BASE = [
     ['KC_BSPACE', 'KC_P', 'KC_O', 'LT3(KC_I)', 'KC_U', 'KC_BTN3', 'USER11'],
     ['KC_ENTER', 'KC_BSLASH', 'KC_L', 'KC_K', 'KC_J', 'KC_H', 'USER26'],
     ['KC_SLASH', 'KC_UP', 'KC_DOT', 'KC_COMMA', 'KC_M', 'KC_N', 'USER17'],
-    ['KC_RIGHT', 'KC_DOWN', 'KC_LEFT', 'LT6(KC_F13)', 'KC_Y', 'KC_SPACE', 'KC_F14'],
+    ['KC_RIGHT', 'KC_DOWN', 'KC_LEFT', 'LT6(KC_F13)', 'KC_Y', 'KC_SPACE', 'KC_SPACE'],
     ['KC_TAB', 'KC_Q', 'KC_W', 'KC_E', 'KC_R', 'KC_T', 'KC_NO'],
     ['KC_CAPSLOCK', 'KC_A', 'KC_S', 'KC_D', 'KC_F', 'KC_G', 'KC_NO'],
     ['KC_LSHIFT', 'KC_Z', 'KC_X', 'KC_C', 'KC_V', 'KC_B', 'KC_MUTE'],
@@ -42,7 +42,7 @@ ALIASES = {
     'KC_QUOTE': 'Quote', 'KC_WH_U': 'MouseWheelUp', 'KC_WH_D': 'MouseWheelDown',
     'KC_VOLU': 'AudioVolUp', 'KC_VOLD': 'AudioVolDown', 'LT3(KC_I)': 'LT(3,I)',
     'LT1(KC_LANG2)': 'LT(1,Language2)', 'LT4(KC_LANG1)': 'LT(4,Language1)',
-    'LT6(KC_F13)': 'LT(6,F13)', 'KC_F14': 'F14',
+    'LT6(KC_F13)': 'LT(6,F13)',
 }
 
 
@@ -108,7 +108,7 @@ class DefaultKeymapTests(unittest.TestCase):
             self.assertEqual([layer[row][col] for row, col in [(4, 6), (5, 6), (7, 6)]],
                              ['KC_NO'] * 3)
         self.assertEqual([layer[3][6] for layer in self.layers],
-                         ['KC_F14', 'KC_NO', 'KC_TRNS', 'KC_TRNS', 'KC_NO', 'KC_NO', 'KC_NO'])
+                         ['KC_SPACE', 'KC_NO', 'KC_TRNS', 'KC_TRNS', 'KC_NO', 'KC_NO', 'KC_NO'])
 
     def test_bluetooth_uses_left_column_and_no_accidental_peer_reset(self):
         for index in (4, 5):

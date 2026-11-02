@@ -24,3 +24,11 @@ pub fn read(keymap: &KeyMap<'_>) -> Tuning {
         _ => None,
     }))
 }
+
+pub fn scroll_inversion(keymap: &KeyMap<'_>) -> (bool, bool) {
+    let id = match keymap.action_at_pos(4, 0, 6) {
+        KeyAction::Single(Action::User(id)) => Some(id),
+        _ => None,
+    };
+    crate::tuning_values::scroll_inversion(id)
+}

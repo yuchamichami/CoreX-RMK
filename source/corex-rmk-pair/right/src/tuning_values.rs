@@ -67,3 +67,23 @@ mod tests {
         }
     }
 }
+
+/// Layer 4 / row 0 / col 6 is a virtual, non-switch settings cell.
+/// Reuse User IDs locally; they are not executed as physical key actions.
+pub fn scroll_inversion(id: Option<u8>) -> (bool, bool) {
+    let bits = match id { Some(28..=31) => id.unwrap() - 28, _ => 0 };
+    (bits & 1 != 0, bits & 2 != 0)
+}
+#[cfg(test)]
+mod scroll_direction_tests {
+    use super::*;
+    #[test] fn independent_axes_and_legacy_default() {
+        for id in [None, Some(0), Some(11), Some(27), Some(255)] {
+            assert_eq!(scroll_inversion(id), (false, false));
+        }
+        assert_eq!(scroll_inversion(Some(28)), (false,false));
+        assert_eq!(scroll_inversion(Some(29)), (true,false));
+        assert_eq!(scroll_inversion(Some(30)), (false,true));
+        assert_eq!(scroll_inversion(Some(31)), (true,true));
+    }
+}

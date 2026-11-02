@@ -1,6 +1,6 @@
 {
   "distribution": "CoreX / Cornix TB",
-  "release": "v0.11.8",
+  "release": "v0.11.9",
   "rust_toolchain": "1.95.0",
   "target": "thumbv7em-none-eabihf",
   "rmk_base_commit": "8a6889854fb996be592c55075b385234133e1772",
@@ -14,21 +14,21 @@
   "images": [
     {
       "side": "raytac-right-26000",
-      "filename": "CoreX-Right-v0.11.8-s140v6.uf2",
-      "application_version": "0.11.8",
-      "binary_bytes": 546836,
-      "binary_sha256": "1aa46b277e9da8b6365c85aabb1790b5ab519ed342e2a88fd8016aa3800afd5d",
-      "uf2_sha256": "af14576693303f0502b4912012062c4e388312f8698abde7888f3ae6ccd77480",
+      "filename": "CoreX-Right-v0.11.9-s140v6.uf2",
+      "application_version": "0.11.9",
+      "binary_bytes": 546924,
+      "binary_sha256": "cef9db753b600ecdd0e9cbd0f0f87d2cf3482c93e32128cd7192a5717383a553",
+      "uf2_sha256": "a36d3987e619eedf9b620a99f694a85278c3d4536da4a8d3182e9ec562a30677",
       "flash_start": "0x26000",
       "flash_end_exclusive": "0xab900"
     },
     {
       "side": "raytac-right-27000",
-      "filename": "CoreX-Right-v0.11.8-s140v7.uf2",
-      "application_version": "0.11.8",
-      "binary_bytes": 546836,
-      "binary_sha256": "a9613db2af43e00814062dd3562f3e970e23e501814bdf0ecd8dd596afad9732",
-      "uf2_sha256": "d4598f99fcbc02d8e6f0c9732840f9f55473c7ffbda02e8227fd89665cfca012",
+      "filename": "CoreX-Right-v0.11.9-s140v7.uf2",
+      "application_version": "0.11.9",
+      "binary_bytes": 546924,
+      "binary_sha256": "c767e3dee74d6e78a546e47d1d94a38cd05ae70196c1469c54d22ea75f387361",
+      "uf2_sha256": "66053e221c2a76a179bb1fe271d5c0322056b3bf40ada7f0721d124ea0127115",
       "flash_start": "0x27000",
       "flash_end_exclusive": "0xac900"
     },
@@ -65,7 +65,7 @@
   ],
   "configuration_profile": {
     "uid": "436f726558525931",
-    "firmware": 2824,
+    "firmware": 2825,
     "pointingDevices": [
       "trackball"
     ],
@@ -103,6 +103,7 @@
         2,
         6
       ]
-    ]
+    ],
+    "scrollDirection": true
   }
 }

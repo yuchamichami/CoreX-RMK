@@ -26,6 +26,6 @@ def configuration_contract(definition, uid):
     if len(version) != 3 or any(n < 0 or n > 255 for n in version):
         raise ValueError('Firmware version cannot be encoded')
     return dict(uid=uid.hex(), firmware=version[0] << 16 | version[1] << 8 | version[2],
-                pointingDevices=['trackball'], gestures=True,
+                pointingDevices=['trackball'], gestures=True, scrollDirection=True,
                 definitionSize=len(definition), definitionSha256=hashlib.sha256(definition).hexdigest(),
                 matrixMap=[list(a + b) for a, b in zip(old, new) if a != b])

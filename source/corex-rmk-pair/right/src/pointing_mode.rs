@@ -92,14 +92,15 @@ impl<'a, const N: usize> PointingModeController<'a, N> {
             self.reset_scales();
             self.cursor_gain = t.cursor;
         }
+        let (invert_x, invert_y) = crate::tuning::scroll_inversion(self.keymap);
         let mode = if self.scrolling {
             PointingMode::Scroll(ScrollConfig {
                 multiplier_x: 1,
                 divisor_x: t.scroll,
                 multiplier_y: 1,
                 divisor_y: t.scroll,
-                invert_x: false,
-                invert_y: false,
+                invert_x,
+                invert_y,
             })
         } else {
             PointingMode::Cursor(CursorConfig::default())

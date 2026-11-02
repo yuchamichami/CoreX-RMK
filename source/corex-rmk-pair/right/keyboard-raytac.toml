@@ -6,6 +6,7 @@ product_id = 0x4643
 manufacturer = "CoreX"
 chip = "nrf52840"
 [rmk]
+combo_max_num = 32
 # CoreX default; Cornix documents the behavior, not its exact idle duration.
 split_central_sleep_timeout_seconds = 300
 [layout]

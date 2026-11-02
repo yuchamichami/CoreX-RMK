@@ -173,6 +173,33 @@ mod ports {
     }
 
     #[test]
+    fn expanded_combo_slots_are_reported_and_all_round_trip_over_vial() {
+        assert_eq!(rmk::types::constants::COMBO_MAX_NUM, 32);
+        let mut fixture = Fixture::new();
+        let keymap = fixture.keymap();
+        block_on(async {
+            let service = HostService::new(&keymap, &RmkConfig::default());
+            async fn command(service: &HostService<'_>, bytes: &[u8]) -> Vec<u8> {
+                let mut request = Request { bytes: [0;32], offset:0 };
+                request.bytes[..bytes.len()].copy_from_slice(bytes);
+                let mut reply = Reply::default();
+                select(service.run_session(&mut request, &mut reply), rmk::test_support::drain_flash_channel()).await;
+                reply.0
+            }
+            let counts = command(&service, &[0xfe,0x0d,0]).await;
+            assert_eq!(counts[1],32);
+            for slot in 0..32u8 {
+                let result = command(&service, &[0xfe,0x0d,4,slot,4,0,5,0,0,0,0,0,40+slot,0]).await;
+                assert_eq!(result[0],0);
+            }
+            for slot in 0..32u8 {
+                let result = command(&service, &[0xfe,0x0d,3,slot]).await;
+                assert_eq!(&result[..11], &[0,4,0,5,0,0,0,0,0,40+slot,0]);
+            }
+        });
+    }
+
+    #[test]
     fn both_ports_output_once_and_unknown_ids_are_ignored() {
         let mut fixture = Fixture::new();
         let keymap = fixture.keymap();

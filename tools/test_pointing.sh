@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 COREX_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+# Match the combo capacity of the shipping right-side configuration.
+export KEYBOARD_TOML_PATH="$COREX_ROOT/source/corex-rmk-pair/right/keyboard-raytac.toml"
 COREX_RUSTC=$(rustup which --toolchain 1.95.0 rustc)
 export PATH="$(dirname "$COREX_RUSTC"):$PATH"
 COREX_HOST=$(rustup run 1.95.0 rustc -vV | sed -n 's/^host: //p')

@@ -27,5 +27,7 @@ def configuration_contract(definition, uid):
         raise ValueError('Firmware version cannot be encoded')
     return dict(uid=uid.hex(), firmware=version[0] << 16 | version[1] << 8 | version[2],
                 pointingDevices=['trackball'], gestures=True, scrollDirection=True,
+                comboSlots=production.get("rmk", {}).get("combo_max_num", 8),
+                backupCompatibleFirmwares=[0x0B09],
                 definitionSize=len(definition), definitionSha256=hashlib.sha256(definition).hexdigest(),
                 matrixMap=[list(a + b) for a, b in zip(old, new) if a != b])

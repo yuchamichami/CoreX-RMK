@@ -150,12 +150,15 @@ mod ports {
         }
     }
     async fn cursor_setting<'a>(keymap: &'a KeyMap<'a>, user: u8) {
+        setting(keymap, 0, user).await;
+    }
+    async fn setting<'a>(keymap: &'a KeyMap<'a>, layer: u8, user: u8) {
         let service = HostService::new(keymap, &RmkConfig::default());
         let mut request = Request {
             bytes: [0; 32],
             offset: 0,
         };
-        request.bytes[..6].copy_from_slice(&[5, 0, 0, 6, 0x7e, user]);
+        request.bytes[..6].copy_from_slice(&[5, layer, 0, 6, 0x7e, user]);
         let mut reply = Reply::default();
         select(
             service.run_session(&mut request, &mut reply),
@@ -164,7 +167,7 @@ mod ports {
         .await;
         assert_eq!(&reply.0[..6], &request.bytes[..6]);
         assert_eq!(
-            keymap.action_at_pos(0, 0, 6),
+            keymap.action_at_pos(layer as usize, 0, 6),
             KeyAction::Single(Action::User(user))
         );
     }
@@ -231,6 +234,29 @@ mod ports {
                 assert_eq!(mouse(), (-1, 0, 0, 0));
             }
             no_report();
+        });
+    }
+
+    #[test]
+    fn vial_scroll_direction_flips_each_axis_on_both_ports_only_in_scroll_mode() {
+        let mut fixture = Fixture::new();
+        let keymap = fixture.keymap();
+        let mut keyboard = Keyboard::new(&keymap);
+        let mut controller = PointingModeController::<2>::new(&keymap);
+        block_on(async {
+            keyboard.process_inner(KeyboardEvent::key(0, 0, true)).await;
+            USB_REPORT_CHANNEL.clear();
+            for (user, wheel, pan) in [(28,-1,1),(29,-1,-1),(30,1,1),(31,1,-1)] {
+                setting(&keymap, 4, user).await;
+                for port in [0,1] {
+                    motion(&mut controller, port, 20, 20).await;
+                    assert_eq!(mouse(), (0,0,wheel,pan));
+                }
+            }
+            keyboard.process_inner(KeyboardEvent::key(0,0,false)).await;
+            USB_REPORT_CHANNEL.clear();
+            motion(&mut controller, 0, 5, 0).await;
+            assert_eq!(mouse(), (-1,0,0,0));
         });
     }
 
